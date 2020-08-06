@@ -10,7 +10,7 @@ from src.pt.path import *
 from src.pt.data import ActivityFileData
 
 
-def launch_pt(port=39000, nogui=False, load_interval=3) -> _subprocess.Popen:
+def launch_pt(port=39000, nogui=False, load_interval=10) -> _subprocess.Popen:
     if _platform.system() == 'Linux':
         ld_library_path = 'LD_LIBRARY_PATH'
         if not _os.getenv(ld_library_path):
