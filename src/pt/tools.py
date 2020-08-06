@@ -22,7 +22,7 @@ def launch_pt(port=39000, nogui=False, load_interval=3) -> _subprocess.Popen:
                                 stderr=_subprocess.DEVNULL)
     _time.sleep(load_interval)
     if process.poll():
-        raise src.pt.exceptions.LaunchingPacketTracerError(port, nogui)
+        raise LaunchingPacketTracerError(port, nogui)
     return process
 
 
