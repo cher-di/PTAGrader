@@ -24,4 +24,4 @@ class Mailer:
 
         with _smtplib.SMTP_SSL(self._mail_server, self._port) as server:
             server.login(from_addr, password)
-            server.send_message(message)
+            server.send_message(message, from_addr, to_addr)
