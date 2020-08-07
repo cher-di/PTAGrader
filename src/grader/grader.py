@@ -26,7 +26,7 @@ class Grader(metaclass=Singleton):
         self._parallel = parallel
 
     @staticmethod
-    def _grade_sequentially(labs: _typing.Iterable[PTLab]) -> \
+    def _grade(labs: _typing.Iterable[PTLab]) -> \
             _typing.Tuple[_typing.Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
         def grade(_lab: PTLab, _pt_process: PTProcess) -> \
                 _typing.Tuple[ActivityFileData or None, ExternalToolError or None]:
@@ -38,15 +38,30 @@ class Grader(metaclass=Singleton):
                 return data, None
 
         with PTProcess() as pt_process:
-            return tuple((lab, ) + grade(lab, pt_process) for lab in labs)
+            return tuple((lab,) + grade(lab, pt_process) for lab in labs)
+
+    @staticmethod
+    def _grade_sequentially(labs: _typing.Iterable[PTLab]) -> \
+            _typing.Tuple[_typing.Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
+        try:
+            result = Grader._grade(labs)
+        except Exception as e:
+            raise e
+        else:
+            return result
 
     @staticmethod
     def _grade_parallel(labs: _typing.Iterable[PTLab], process_num: int) -> \
             _typing.Tuple[_typing.Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
         chunks = src.commons.functions.get_chunks(labs, process_num)
         with _mp.Pool(process_num) as pool:
-            result = pool.map(Grader._grade_sequentially, chunks)
-        return tuple(_itertools.chain.from_iterable(result))
+            try:
+                result = pool.map(Grader._grade, chunks)
+            except Exception as e:
+                pool.terminate()
+                raise e
+            else:
+                return tuple(_itertools.chain.from_iterable(result))
 
     @staticmethod
     def _get_optimal_process_num(labs_num: int):
@@ -61,27 +76,32 @@ class Grader(metaclass=Singleton):
             return cpu_count
 
     @staticmethod
-    def _grade(labs: _typing.Iterable[PTLab], parallel: bool) \
+    def grade(labs: _typing.Iterable[PTLab], parallel: bool) \
             -> _typing.Tuple[_typing.Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
         labs = tuple(labs)
         process_num = Grader._get_optimal_process_num(len(labs))
         if not parallel or process_num == 1:
-            return Grader._grade_sequentially(labs)
+            return Grader._grade(labs)
         else:
             return Grader._grade_parallel(labs, process_num)
 
-    @staticmethod
     @_abc.abstractmethod
-    def get_files(dir_path: str) -> _typing.Tuple[PTLab, ...]:
+    def get_files(self, dir_path: str) -> _typing.Tuple[PTLab, ...]:
         pass
 
-    @staticmethod
     @_abc.abstractmethod
-    def after_grade(grade_result: _typing.Tuple[_typing.Tuple[PTLab, ActivityFileData, ExternalToolError], ...]):
+    def after_grade(self, grade_result: _typing.Tuple[_typing.Tuple[PTLab, ActivityFileData, ExternalToolError], ...]):
+        pass
+
+    @_abc.abstractmethod
+    def process_error(self, error: Exception):
         pass
 
     def run(self):
         with _tempfile.TemporaryDirectory(dir=src.PROJECT_ROOT) as temp_dir:
-            labs = self.__class__.get_files(temp_dir)
-            grade_result = self.__class__._grade(labs, self._parallel)
-            self.after_grade(grade_result)
+            try:
+                labs = self.get_files(temp_dir)
+                grade_result = self.__class__.grade(labs, self._parallel)
+                self.after_grade(grade_result)
+            except Exception as e:
+                self.process_error(e)
