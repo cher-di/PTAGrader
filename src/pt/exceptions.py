@@ -1,7 +1,4 @@
-from src.commons.exceptions import PTAGraderError
-
-
-class ExternalToolError(PTAGraderError):
+class ExternalToolError(Exception):
     pass
 
 
@@ -66,7 +63,7 @@ class MetaRunningError(ExternalToolError):
         return f'An error occurred while running meta with xml: {self._xml_filepath} and pta: {self._pta_filepath}'
 
 
-class PTProcessError(PTAGraderError):
+class PTProcessError(Exception):
     def __init__(self, port: int, nogui: bool):
         self._port = port
         self._nogui = nogui
@@ -88,3 +85,8 @@ class PTProcessAlreadyRunningError(PTProcessError):
 class PTProcessNotStarted(PTProcessError):
     def __str__(self):
         return f'This instance of PTProcess with port {self._port} and nogui={self._nogui} is not started'
+
+
+class PortInUse(PTProcessError):
+    def __str__(self):
+        return f'Port {self._port} is already in use'

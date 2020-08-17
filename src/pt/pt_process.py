@@ -1,12 +1,10 @@
-import subprocess as _subprocess
+import subprocess
 
 import src.pt.tools
 import src.pt.exceptions
 import src.commons.functions
-import src.commons.exceptions
 
-
-from src.pt.data import ActivityFileData
+from src.pt.tools import ActivityFileData
 
 
 class PTProcess:
@@ -15,11 +13,11 @@ class PTProcess:
             self._port = src.commons.functions.get_free_port()
         else:
             if src.commons.functions.is_port_in_use(port):
-                raise src.commons.exceptions.PortInUse(port)
+                raise src.pt.exceptions.PortInUse(port, nogui)
             else:
                 self._port = port
         self._nogui = nogui
-        self._process: _subprocess.Popen = None
+        self._process: subprocess.Popen = None
 
     def __enter__(self) -> 'PTProcess':
         self.start()

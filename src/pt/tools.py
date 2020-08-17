@@ -1,26 +1,34 @@
-import subprocess as _subprocess
-import json as _json
-import os as _os
-import time as _time
-import platform as _platform
+import subprocess
+import json
+import time
+import dataclasses
 
 from src.pt.exceptions import *
 from src.pt.path import *
 
-from src.pt.data import ActivityFileData
+
+@dataclasses.dataclass(frozen=True)
+class ActivityFileData:
+    name: str
+    email: str
+    percentageComplete: float
+    percentageCompleteScore: float
+    addInfo: str
+    timeElapsed: int
+    labID: str
 
 
-def launch_pt(port=39000, nogui=False, load_interval=10) -> _subprocess.Popen:
-    if _platform.system() == 'Linux':
+def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
+    if platform.system() == 'Linux':
         ld_library_path = 'LD_LIBRARY_PATH'
-        if not _os.getenv(ld_library_path):
-            _os.environ[ld_library_path] = PT_BIN_DIR
+        if not os.getenv(ld_library_path):
+            os.environ[ld_library_path] = PT_BIN_DIR
 
-    process = _subprocess.Popen((PT_EXECUTABLE, '--ipc-port', str(port), '--no-gui' if nogui else ''),
-                                cwd=PT_BIN_DIR,
-                                stdout=_subprocess.DEVNULL,
-                                stderr=_subprocess.DEVNULL)
-    _time.sleep(load_interval)
+    process = subprocess.Popen((PT_EXECUTABLE, '--ipc-port', str(port), '--no-gui' if nogui else ''),
+                               cwd=PT_BIN_DIR,
+                               stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL)
+    time.sleep(load_interval)
     if process.poll():
         raise LaunchingPacketTracerError(port, nogui)
     return process
@@ -28,11 +36,11 @@ def launch_pt(port=39000, nogui=False, load_interval=10) -> _subprocess.Popen:
 
 def call_grader(filepath: str, password: str, attempts=10, delay=500, host='localhost',
                 port=39000) -> ActivityFileData:
-    completed_process = _subprocess.run(('java', '-jar', PT_GRADER, '--input', filepath,
-                                         '--key', password, '--attempts', str(attempts), '--delay', str(delay),
-                                         '--host', host, '--port', str(port)),
-                                        capture_output=True,
-                                        text=True)
+    completed_process = subprocess.run(('java', '-jar', PT_GRADER, '--input', filepath,
+                                        '--key', password, '--attempts', str(attempts), '--delay', str(delay),
+                                        '--host', host, '--port', str(port)),
+                                       capture_output=True,
+                                       text=True)
 
     if completed_process.returncode:
         if completed_process.returncode == 1:
@@ -50,19 +58,19 @@ def call_grader(filepath: str, password: str, attempts=10, delay=500, host='loca
         else:
             raise GraderError(completed_process.stderr)
 
-    for line in completed_process.stdout.split(_os.linesep):
+    for line in completed_process.stdout.split(os.linesep):
         first_bracket_index = line.find('{')
         last_bracket_index = line.rfind('}')
         if first_bracket_index != -1 and last_bracket_index != -1:
             try:
-                data = _json.loads(line[first_bracket_index:last_bracket_index + 1])
+                data = json.loads(line[first_bracket_index:last_bracket_index + 1])
                 return ActivityFileData(**data)
-            except _json.JSONDecodeError:
+            except json.JSONDecodeError:
                 pass
 
 
 def call_meta(xml_filepath: str, pta_filepath: str):
-    completed_process = _subprocess.run((PT_META, pta_filepath, xml_filepath))
+    completed_process = subprocess.run((PT_META, pta_filepath, xml_filepath))
     if completed_process.returncode:
         raise MetaRunningError(xml_filepath, pta_filepath)
 
