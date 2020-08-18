@@ -4,7 +4,7 @@ import dataclasses
 
 import src.commons.functions
 
-from typing import Iterable, Tuple, Union
+from typing import Iterable, Tuple, Union, Mapping
 
 from src.pt.tools import ActivityFileData
 from src.pt.exceptions import ExternalToolError
@@ -18,12 +18,13 @@ class PTLab:
 
 
 class Grader:
-    def __init__(self, labs: Iterable[PTLab], parallel=False):
+    def __init__(self, labs: Iterable[PTLab], parallel=False, nogui=False):
         self._labs = tuple(labs)
         self._parallel = parallel
+        self._nogui = nogui
 
     @staticmethod
-    def _grade(labs: Iterable[PTLab]) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
+    def _grade(labs: Iterable[PTLab], nogui: bool) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
         def grade(_lab: PTLab, _pt_process: PTProcess) -> Union[Tuple[ActivityFileData, ExternalToolError]]:
             try:
                 data = _pt_process.grade(_lab.filepath, _lab.password)
@@ -32,17 +33,17 @@ class Grader:
             else:
                 return data, None
 
-        with PTProcess() as pt_process:
+        with PTProcess(nogui=nogui) as pt_process:
             return tuple((lab,) + grade(lab, pt_process) for lab in labs)
 
     def _grade_sequentially(self) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
-        return self.__class__._grade(self._labs)
+        return self.__class__._grade(self._labs, self._nogui)
 
     def _grade_parallel(self, process_num: int) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
         chunks = tuple(src.commons.functions.get_chunks(self._labs, process_num))
         with mp.Pool(process_num) as pool:
             try:
-                result = pool.map(self.__class__._grade, chunks)
+                result = pool.map(lambda labs: self.__class__._grade(labs, self._nogui), chunks)
             except Exception as e:
                 pool.terminate()
                 raise e
@@ -67,3 +68,8 @@ class Grader:
             return self._grade_sequentially()
         else:
             return self._grade_parallel(process_num)
+
+
+def grade(labs: Iterable[Mapping[str, str]], parallel=False, nogui=False):
+    pt_labs = (PTLab(**lab) for lab in labs)
+    return Grader(pt_labs, parallel, nogui).run()
