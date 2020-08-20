@@ -69,11 +69,5 @@ def call_grader(filepath: str, password: str, attempts=10, delay=500, host='loca
                 pass
 
 
-def call_meta(xml_filepath: str, pta_filepath: str):
-    completed_process = subprocess.run((PT_META, pta_filepath, xml_filepath))
-    if completed_process.returncode:
-        raise MetaRunningError(xml_filepath, pta_filepath)
-
-
 if __name__ == '__main__':
     print('This is module with functions to call external grader pt')

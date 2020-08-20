@@ -25,11 +25,27 @@ def _get_pt_executable():
         raise FileNotFoundError('Can not find Packet Tracer executable')
 
 
+def _get_pt_grader_root():
+    return os.path.join(TOOLS_ROOT, 'grader')
+
+
+def _get_pt_meta_root():
+    return os.path.join(TOOLS_ROOT, 'meta')
+
+
+def _get_pt_grader():
+    grader = os.path.join(_get_pt_grader_root(), 'Grader.jar')
+    if os.path.exists(grader):
+        return grader
+    else:
+        raise FileNotFoundError('Can not find Grader.jar')
+
+
 def _get_pt_meta():
     if platform.system() == 'Windows':
-        return os.path.join(_get_pt_bin_dir(), 'meta.exe')
+        return os.path.join(_get_pt_meta_root(), 'meta.exe')
     elif platform.system() == 'Linux':
-        return os.path.join(_get_pt_bin_dir(), 'meta')
+        return os.path.join(_get_pt_meta_root(), 'meta')
     else:
         raise FileNotFoundError('Can not find Packet Tracer meta')
 
@@ -37,6 +53,6 @@ def _get_pt_meta():
 PT_HOME = _get_pt_home()
 PT_BIN_DIR = _get_pt_bin_dir()
 PT_EXECUTABLE = _get_pt_executable()
-PT_META = _get_pt_meta()
 
-PT_GRADER = os.path.join(TOOLS_ROOT, 'Grader.jar')
+PT_GRADER_ROOT = _get_pt_grader_root()
+PT_GRADER = _get_pt_grader()
