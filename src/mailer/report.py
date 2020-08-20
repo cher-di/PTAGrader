@@ -1,4 +1,14 @@
 import abc
+import jinja2
+import os
+
+from src import RESOURCES_ROOT
+
+TEMPLATES_ROOT = os.path.join(RESOURCES_ROOT, 'templates')
+
+env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(TEMPLATES_ROOT),
+)
 
 DEFAULT_ERROR_MARK = 0
 
@@ -10,28 +20,40 @@ class Report(abc.ABC):
         self._mark = mark
 
     @property
+    def parameters(self) -> dict:
+        return {
+            'name': self._name,
+            'lab_name': self._lab_name,
+            'mark': self._mark,
+        }
+
+    @property
     @abc.abstractmethod
-    def html(self) -> str:
+    def html_template(self) -> str:
         pass
+
+    def html(self) -> str:
+        template = env.get_template(self.html_template)
+        return template.render(self.parameters)
 
 
 class ErrorReport(Report, abc.ABC):
-    def __init__(self, email: str, lab_name: str):
-        super().__init__(email, lab_name, DEFAULT_ERROR_MARK)
+    def __init__(self, name: str, lab_name: str):
+        super().__init__(name, lab_name, DEFAULT_ERROR_MARK)
 
 
 class StandardReport(Report):
 
     @property
-    def html(self) -> str:
-        pass
+    def html_template(self) -> str:
+        return 'standard.html'
 
 
 class CorruptedFileReport(ErrorReport):
 
     @property
-    def html(self) -> str:
-        pass
+    def html_template(self) -> str:
+        return 'corrupted_file.html'
 
 
 class WrongLabReport(ErrorReport):
@@ -40,19 +62,21 @@ class WrongLabReport(ErrorReport):
         self._extracted_lab_name = extracted_lab_name
 
     @property
-    def html(self) -> str:
-        pass
+    def parameters(self) -> dict:
+        parameters = super().parameters
+        parameters['extracted_lab_name'] = self._extracted_lab_name
+        return parameters
 
     @property
-    def extracted_lab_name(self) -> str:
-        return self._extracted_lab_name
+    def html_template(self) -> str:
+        return 'wrong_lab.html'
 
 
 class NotLabReport(ErrorReport):
 
     @property
-    def html(self) -> str:
-        pass
+    def html_template(self) -> str:
+        return 'not_lab.html'
 
 
 class WrongEmailReport(ErrorReport):
@@ -62,5 +86,12 @@ class WrongEmailReport(ErrorReport):
         self._extracted_email = extracted_email
 
     @property
-    def html(self) -> str:
-        pass
+    def parameters(self) -> dict:
+        parameters = super().parameters
+        parameters['real_email'] = self._real_email
+        parameters['extracted_email'] = self._extracted_email
+        return parameters
+
+    @property
+    def html_template(self) -> str:
+        return 'wrong_email.html'
