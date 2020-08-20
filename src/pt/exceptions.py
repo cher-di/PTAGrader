@@ -64,13 +64,18 @@ class MetaRunningError(ExternalToolError):
 
 
 class PTProcessError(Exception):
-    def __init__(self, port: int, nogui: bool):
+    def __init__(self, port: int, load_interval: int, nogui: bool):
         self._port = port
+        self._load_interval = load_interval
         self._nogui = nogui
 
     @property
     def port(self) -> int:
         return self._port
+
+    @property
+    def load_interval(self) -> int:
+        return self._load_interval
 
     @property
     def nogui(self) -> bool:
@@ -79,12 +84,14 @@ class PTProcessError(Exception):
 
 class PTProcessAlreadyRunningError(PTProcessError):
     def __str__(self):
-        return f'This instance of PTProcess with port {self._port} and nogui={self._nogui} is already running'
+        return f'This instance of PTProcess with port={self._port}, load_interval={self._load_interval} ' \
+               f'and nogui={self._nogui} is already running'
 
 
 class PTProcessNotStarted(PTProcessError):
     def __str__(self):
-        return f'This instance of PTProcess with port {self._port} and nogui={self._nogui} is not started'
+        return f'This instance of PTProcess with port={self._port}, load_interval={self._load_interval} ' \
+               f'and nogui={self._nogui} is not started'
 
 
 class PortInUse(PTProcessError):
