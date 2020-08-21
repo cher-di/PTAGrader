@@ -1,45 +1,40 @@
 import multiprocessing as mp
 import itertools
-import dataclasses
 
 import src.commons.functions
 
-from typing import Iterable, Tuple, Mapping
+from typing import Iterable, Tuple, Mapping, Dict
 
 from src.pt.tools import ActivityFileData
 from src.pt.exceptions import ExternalToolError
 from src.pt.pt_process import PTProcess
 
 
-@dataclasses.dataclass(frozen=True)
-class PTLab:
-    filepath: str
-    password: str
-
-
 class Grader:
-    def __init__(self, labs: Iterable[PTLab], load_interval: int, parallel=False, nogui=False):
-        self._labs = tuple(labs)
+    def __init__(self, labs: Mapping[str, str], load_interval: int, parallel=False, nogui=False):
+        self._labs = tuple(labs.items())
         self._load_interval = load_interval
         self._parallel = parallel
         self._nogui = nogui
 
-    def _grade(self, labs: Iterable[PTLab]) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
-        def _grade_one(_lab: PTLab, _pt_process: PTProcess) -> Tuple[ActivityFileData, ExternalToolError]:
+    def _grade(self, labs: Iterable[Tuple[str, str]]) -> Tuple[Tuple[str, Tuple[ActivityFileData, ExternalToolError]],
+                                                               ...]:
+        def _grade_one(_filepath: str, _password: str, _pt_process: PTProcess) -> Tuple[ActivityFileData,
+                                                                                        ExternalToolError]:
             try:
-                data = _pt_process.grade(_lab.filepath, _lab.password)
+                data = _pt_process.grade(_filepath, _password)
             except ExternalToolError as e:
                 return None, e
             else:
                 return data, None
 
         with PTProcess(self._load_interval, nogui=self._nogui) as pt_process:
-            return tuple((lab,) + _grade_one(lab, pt_process) for lab in labs)
+            return tuple((filepath, _grade_one(filepath, password, pt_process)) for filepath, password in labs)
 
-    def _grade_sequentially(self) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
-        return self._grade(self._labs)
+    def _grade_sequentially(self) -> Dict[str, Tuple[ActivityFileData, ExternalToolError]]:
+        return dict(self._grade(self._labs))
 
-    def _grade_parallel(self, process_num: int) -> Tuple[Tuple[PTLab, ActivityFileData, ExternalToolError], ...]:
+    def _grade_parallel(self, process_num: int) -> Dict[str, Tuple[ActivityFileData, ExternalToolError]]:
         chunks = tuple(src.commons.functions.get_chunks(self._labs, process_num))
         with mp.Pool(process_num) as pool:
             try:
@@ -48,9 +43,9 @@ class Grader:
                 pool.terminate()
                 raise e
             else:
-                return tuple(itertools.chain.from_iterable(result))
+                return dict(itertools.chain.from_iterable(result))
 
-    def _get_optimal_process_num(self):
+    def _get_optimal_process_num(self) -> int:
         labs_num = len(self._labs)
         cpu_count = mp.cpu_count()
         if labs_num < cpu_count * 2:
@@ -62,7 +57,7 @@ class Grader:
         else:
             return cpu_count
 
-    def run(self):
+    def run(self) -> Dict[str, Tuple[ActivityFileData, ExternalToolError]]:
         process_num = self._get_optimal_process_num()
         if not self._parallel or process_num == 1:
             return self._grade_sequentially()
@@ -71,5 +66,4 @@ class Grader:
 
 
 def grade(labs: Iterable[Mapping[str, str]], load_interval: int, parallel=False, nogui=False):
-    pt_labs = (PTLab(**lab) for lab in labs)
-    return Grader(pt_labs, load_interval, parallel, nogui).run()
+    return Grader(labs, load_interval, parallel, nogui).run()
