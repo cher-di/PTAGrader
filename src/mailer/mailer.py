@@ -1,38 +1,54 @@
 import smtplib
-import typing
+import copy
 
-from email.message import EmailMessage
-from email.header import Header
+from abc import ABC, abstractmethod
+from typing import Iterable, Union
+
 from email.utils import formataddr
+from email.header import Header
+from email.mime.multipart import MIMEMultipart
 
 
-class Mailer:
-    def __init__(self, mail_server: str):
-        self._mail_server = mail_server
-        self._port = 465
-
-    def send(self, from_addr: str, to_addr: str or typing.Iterable[str], password: str,
-             message: EmailMessage, sender: str = None):
-        if not message['From']:
-            if not sender:
-                message['From'] = from_addr
-            else:
-                message['From'] = formataddr((str(Header(sender, 'utf-8')), from_addr))
-
-        if not message['To']:
-            message['To'] = to_addr if type(to_addr) == str else ', '.join(to_addr)
-
-        with smtplib.SMTP_SSL(self._mail_server, self._port) as server:
-            server.login(from_addr, password)
-            server.send_message(message, from_addr, to_addr)
-
-
-class PersonalMailer:
-    def __init__(self, mail_server: str, addr: str, password: str, name: str = None):
-        self._mailer = Mailer(mail_server)
-        self._addr = addr
+class Mailer(ABC):
+    def __init__(self, server: str, port: int, address: str, password: str, name: str = None):
+        self._server = server
+        self._port = port
+        self._address = address
         self._password = password
         self._name = name
 
-    def send(self, to_addr: str or typing.Iterable[str], message: EmailMessage):
-        self._mailer.send(self._addr, to_addr, self._password, message, self._name)
+    @staticmethod
+    def _add_from_and_to(from_address: str, to_address: str, message: MIMEMultipart, name: str = None) -> MIMEMultipart:
+        new_message = copy.copy(message)
+        if name:
+            from_address = formataddr((str(Header(name, 'utf-8')), from_address))
+        new_message['From'] = from_address
+        new_message['To'] = to_address
+        return new_message
+
+    @abstractmethod
+    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
+        pass
+
+
+class SSLMailer(Mailer):
+    def __init__(self, server: str, address: str, password: str, name: str = None):
+        super().__init__(server, 465, address, password, name)
+
+    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
+        with smtplib.SMTP_SSL(self._server, self._port) as server:
+            server.login(self._address, self._password)
+            new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
+            server.send_message(new_message, self._address, address)
+
+
+class TLSMailer(Mailer):
+    def __init__(self, server: str, address: str, password: str, name: str = None):
+        super().__init__(server, 587, address, password, name)
+
+    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
+        with smtplib.SMTP(self._server, self._port) as server:
+            server.starttls()
+            server.login(self._address, self._password)
+            new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
+            server.send_message(new_message, self._address, address)
