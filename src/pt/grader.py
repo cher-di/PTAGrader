@@ -65,5 +65,5 @@ class Grader:
             return self._grade_parallel(process_num)
 
 
-def grade(labs: Iterable[Mapping[str, str]], load_interval: int, parallel=False, nogui=False):
+def grade(labs: Mapping[str, str], load_interval: int, parallel=False, nogui=False):
     return Grader(labs, load_interval, parallel, nogui).run()
