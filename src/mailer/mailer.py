@@ -16,6 +16,15 @@ class Mailer(ABC):
         self._address = address
         self._password = password
         self._name = name
+        self._connection = None
+
+    @abstractmethod
+    def __enter__(self) -> 'Mailer':
+        pass
+
+    @abstractmethod
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     @staticmethod
     def _add_from_and_to(from_address: str, to_address: str, message: MIMEMultipart, name: str = None) -> MIMEMultipart:
@@ -35,20 +44,32 @@ class SSLMailer(Mailer):
     def __init__(self, server: str, address: str, password: str, name: str = None):
         super().__init__(server, 465, address, password, name)
 
+    def __enter__(self) -> 'SSLMailer':
+        self._connection = smtplib.SMTP_SSL(self._server, self._port)
+        self._connection.login(self._address, self._password)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._connection.close()
+
     def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
-        with smtplib.SMTP_SSL(self._server, self._port) as server:
-            server.login(self._address, self._password)
-            new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
-            server.send_message(new_message, self._address, address)
+        new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
+        self._connection.send_message(new_message, self._address, address)
 
 
 class TLSMailer(Mailer):
     def __init__(self, server: str, address: str, password: str, name: str = None):
         super().__init__(server, 587, address, password, name)
 
+    def __enter__(self) -> 'TLSMailer':
+        self._connection = smtplib.SMTP(self._server, self._port)
+        self._connection.starttls()
+        self._connection.login(self._address, self._password)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._connection.close()
+
     def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
-        with smtplib.SMTP(self._server, self._port) as server:
-            server.starttls()
-            server.login(self._address, self._password)
-            new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
-            server.send_message(new_message, self._address, address)
+        new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
+        self._connection.send_message(new_message, self._address, address)
