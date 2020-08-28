@@ -54,7 +54,7 @@ class SSLMailer(Mailer):
 
     def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
         new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
-        self._connection.send_message(new_message, self._address, address)
+        self._connection.sendmail(self._address, address, new_message.as_string())
 
 
 class TLSMailer(Mailer):
@@ -72,4 +72,4 @@ class TLSMailer(Mailer):
 
     def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
         new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
-        self._connection.send_message(new_message, self._address, address)
+        self._connection.sendmail(self._address, address, new_message.as_string())
