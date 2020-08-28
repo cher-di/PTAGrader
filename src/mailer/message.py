@@ -14,14 +14,13 @@ class Message:
             self._message['Subject'] = subject
 
     def attach(self, filepath: str, filename: str = None):
-        with open(filepath, 'rb') as file:
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(file.read())
-        self._message.attach(part)
-        encoders.encode_base64(part)
-        if not filename:
-            filename = os.path.basename(filepath)
+        filename = os.path.basename(filepath) if not filename else filename
+        part = MIMEBase("application", "octet-stream")
         part.add_header("Content-Disposition", f"attachment; filename= {filename}")
+        with open(filepath, 'rb') as file:
+            part.set_payload(file.read())
+        encoders.encode_base64(part)
+        self._message.attach(part)
 
     @property
     def message(self) -> MIMEMultipart:
