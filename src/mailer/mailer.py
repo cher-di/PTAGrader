@@ -73,16 +73,16 @@ class SMTPLIBMailer(Mailer, ABC):
 
 
 class SSLMailer(SMTPLIBMailer):
-    def __init__(self, server: str, address: str, password: str, name: str = None):
-        super().__init__(server, 465, address, password, name)
+    def __init__(self, server: str, address: str, password: str, name: str = None, port=465):
+        super().__init__(server, port, address, password, name)
 
     def _open(self):
         self._connection = smtplib.SMTP_SSL(self._server, self._port)
 
 
 class TLSMailer(SMTPLIBMailer):
-    def __init__(self, server: str, address: str, password: str, name: str = None):
-        super().__init__(server, 587, address, password, name)
+    def __init__(self, server: str, address: str, password: str, name: str = None, port=587):
+        super().__init__(server, port, address, password, name)
 
     def _open(self):
         self._connection = smtplib.SMTP(self._server, self._port)
