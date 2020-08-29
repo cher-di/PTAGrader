@@ -18,7 +18,8 @@ class Mailer(ABC):
         self._name = name
 
     def __enter__(self) -> 'Mailer':
-        return self.open()
+        self.open()
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
@@ -33,7 +34,7 @@ class Mailer(ABC):
         return new_message
 
     @abstractmethod
-    def open(self) -> 'Mailer':
+    def open(self):
         pass
 
     @abstractmethod
@@ -69,7 +70,6 @@ class SMTPLIBMailer(Mailer, ABC):
     def open(self):
         self._open()
         self._auth()
-        return self
 
 
 class SSLMailer(SMTPLIBMailer):
