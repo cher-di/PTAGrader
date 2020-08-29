@@ -16,15 +16,12 @@ class Mailer(ABC):
         self._address = address
         self._password = password
         self._name = name
-        self._connection = None
 
-    @abstractmethod
     def __enter__(self) -> 'Mailer':
-        pass
+        return self.open()
 
-    @abstractmethod
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+        self.close()
 
     @staticmethod
     def _add_from_and_to(from_address: str, to_address: str, message: MIMEMultipart, name: str = None) -> MIMEMultipart:
@@ -36,40 +33,57 @@ class Mailer(ABC):
         return new_message
 
     @abstractmethod
+    def open(self) -> 'Mailer':
+        pass
+
+    @abstractmethod
+    def close(self):
+        pass
+
+    @abstractmethod
     def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
         pass
 
 
-class SSLMailer(Mailer):
+class SMTPLIBMailer(Mailer, ABC):
+    def __init__(self, server: str, port: int, address: str, password: str, name: str = None):
+        super().__init__(server, port, address, password, name)
+        self._connection: smtplib.SMTP = None
+
+    def close(self):
+        self._connection.close()
+
+    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
+        if not self._connection:
+            raise ConnectionError(f'Mailer is not connected to SMTP server {self._server}')
+        new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
+        self._connection.sendmail(self._address, address, new_message.as_string())
+
+    def _auth(self):
+        self._connection.login(self._address, self._password)
+
+    @abstractmethod
+    def _open(self):
+        pass
+
+    def open(self):
+        self._open()
+        self._auth()
+        return self
+
+
+class SSLMailer(SMTPLIBMailer):
     def __init__(self, server: str, address: str, password: str, name: str = None):
         super().__init__(server, 465, address, password, name)
 
-    def __enter__(self) -> 'SSLMailer':
+    def _open(self):
         self._connection = smtplib.SMTP_SSL(self._server, self._port)
-        self._connection.login(self._address, self._password)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self._connection.close()
-
-    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
-        new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
-        self._connection.sendmail(self._address, address, new_message.as_string())
 
 
-class TLSMailer(Mailer):
+class TLSMailer(SMTPLIBMailer):
     def __init__(self, server: str, address: str, password: str, name: str = None):
         super().__init__(server, 587, address, password, name)
 
-    def __enter__(self) -> 'TLSMailer':
+    def _open(self):
         self._connection = smtplib.SMTP(self._server, self._port)
         self._connection.starttls()
-        self._connection.login(self._address, self._password)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self._connection.close()
-
-    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
-        new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
-        self._connection.sendmail(self._address, address, new_message.as_string())
