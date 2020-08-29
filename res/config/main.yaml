@@ -1,0 +1,19 @@
+grader:
+  parallel: True
+  load_interval: 10
+  nogui: True
+
+classroom:
+  course_id: null
+
+mailer:
+  enable_students_mailing: True
+  enable_admins_mailing: True
+  server: null
+  connection: ssl
+  port: 465
+  address: null
+  password: null
+  admins_mail_list:
+    - admin_address1
+    - admin_address2
