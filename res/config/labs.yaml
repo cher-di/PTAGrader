@@ -1,9 +1,9 @@
 course_work_id1:
-  lab_id: null
-  password: null
+  lab_id: "1"
+  password: password1
 course_work_id2:
-  lab_id: null
-  password: null
+  lab_id: "2"
+  password: password2
 course_work_id3:
-  lab_id: null
-  password: null
+  lab_id: "3"
+  password: password3

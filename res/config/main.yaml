@@ -4,16 +4,16 @@ grader:
   nogui: True
 
 classroom:
-  course_id: null
+  course_id: "12345678"
 
 mailer:
   enable_students_mailing: True
   enable_admins_mailing: True
-  server: null
+  server: smtp.example.ru
   connection: ssl
   port: 465
-  address: null
-  password: null
+  address: mailer@example.com
+  password: password
   admins_mail_list:
-    - admin_address1
-    - admin_address2
+    - admin1@example.com
+    - admin2@example.com
