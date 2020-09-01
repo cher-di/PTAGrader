@@ -14,6 +14,7 @@ mailer:
   port: 465
   address: mailer@example.com
   password: password
+  name: name
   admins_mail_list:
     - admin1@example.com
     - admin2@example.com
