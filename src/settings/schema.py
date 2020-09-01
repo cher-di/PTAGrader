@@ -28,7 +28,7 @@ MAIN_CONFIG_SCHEMA = {
                 'admins_mail_list': {
                     'type': 'array',
                     'items': {
-                        'type': 'str',
+                        'type': 'string',
                         'format': 'email'
                     }
                 }

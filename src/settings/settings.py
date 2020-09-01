@@ -6,6 +6,7 @@ from typing import Dict
 from fastjsonschema import validate
 
 from src import CONFIG_ROOT
+from src.settings.schema import MAIN_CONFIG_SCHEMA, LABS_CONFIG_SCHEMA
 
 
 @dataclasses.dataclass(frozen=True)
@@ -57,7 +58,7 @@ def load_config(filepath: str, schema: dict = None) -> dict:
 MAIN_CONFIG_FILEPATH = os.path.join(CONFIG_ROOT, 'main.yaml')
 LABS_CONFIG_FILEPATH = os.path.join(CONFIG_ROOT, 'labs.yaml')
 
-MAIN_CONFIG = load_config(MAIN_CONFIG_FILEPATH)
-LABS_CONFIG = load_config(LABS_CONFIG_FILEPATH)
+MAIN_CONFIG = load_config(MAIN_CONFIG_FILEPATH, MAIN_CONFIG_SCHEMA)
+LABS_CONFIG = load_config(LABS_CONFIG_FILEPATH, LABS_CONFIG_SCHEMA)
 
 SETTINGS = Settings(**{**MAIN_CONFIG, **{'labs': LABS_CONFIG}})
