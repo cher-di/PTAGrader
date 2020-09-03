@@ -1,3 +1,6 @@
+from typing import Iterable
+
+
 class ExternalToolError(Exception):
     pass
 
@@ -52,6 +55,14 @@ class GraderWrongPassword(GraderError):
     @property
     def password(self) -> str:
         return self._password
+
+
+class GraderNoJsonInStdout(GraderError):
+    def __init__(self, stdout: str):
+        self._stdout = stdout
+
+    def __str__(self):
+        return f'No json string in Grader stdout: {self._stdout}'
 
 
 class MetaRunningError(ExternalToolError):

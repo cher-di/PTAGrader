@@ -4,7 +4,7 @@ import src.pt.tools
 import src.pt.exceptions
 import src.commons.functions
 
-from src.pt.tools import ActivityFileData
+from src.pt.activity_file_data import ActivityFileData
 
 
 class PTProcess:
@@ -31,7 +31,8 @@ class PTProcess:
         return f'{self.__class__}({self._port, self._nogui})'
 
     def grade(self, filepath: str, password: str) -> ActivityFileData:
-        return src.pt.tools.call_grader(filepath, password, port=self._port)
+        data = src.pt.tools.call_grader(filepath, password, port=self._port)
+        return ActivityFileData(**data)
 
     def start(self):
         if not self._process:
