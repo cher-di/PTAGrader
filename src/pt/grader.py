@@ -5,7 +5,7 @@ import src.commons.functions
 
 from typing import Iterable, Tuple, Mapping, Dict
 
-from src.pt.tools import ActivityFileData
+from src.pt.activity_file_data import ActivityFileData
 from src.pt.exceptions import ExternalToolError
 from src.pt.pt_process import PTProcess
 
