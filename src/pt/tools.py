@@ -1,10 +1,22 @@
 import subprocess
 import json
 import time
-import dataclasses
+
+from typing import Tuple
 
 from src.pt.exceptions import *
 from src.pt.path import *
+
+
+def make_params(*args, **kwargs) -> Tuple[str, ...]:
+    params = [str(arg) for arg in args]
+    for name, value in kwargs.items():
+        if value is not None:
+            if value:
+                params.append(f'--{name}')
+                if type(value) != bool:
+                    params.append(str(value))
+    return tuple(params)
 
 
 def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
@@ -13,7 +25,13 @@ def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
         if not os.getenv(ld_library_path):
             os.environ[ld_library_path] = PT_BIN_DIR
 
-    process = subprocess.Popen((PT_EXECUTABLE, '--ipc-port', str(port), '--no-gui' if nogui else ''),
+    params = make_params(PT_EXECUTABLE,
+                         **{
+                             'ipc-port': port,
+                             'nogui': nogui
+                         })
+
+    process = subprocess.Popen(params,
                                cwd=PT_BIN_DIR,
                                stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL)
@@ -23,11 +41,19 @@ def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
     return process
 
 
-def call_grader(filepath: str, password: str, attempts=10, delay=500, host='localhost',
-                port=39000) -> dict:
-    completed_process = subprocess.run(('java', '-jar', PT_GRADER, '--input', filepath,
-                                        '--key', password, '--attempts', str(attempts), '--delay', str(delay),
-                                        '--host', host, '--port', str(port)),
+def call_grader(filepath: str, password: str, host='localhost', port=39000, conn_attempts=5, conn_delay=100,
+                alive_attempts=10, alive_delay=2000) -> dict:
+    params = make_params('java', '-jar', PT_GRADER,
+                         input=filepath,
+                         key=password,
+                         host=host,
+                         port=port,
+                         conn_attempts=conn_attempts,
+                         conn_delay=conn_delay,
+                         alive_attempts=alive_attempts,
+                         alive_delay=alive_delay)
+
+    completed_process = subprocess.run(params,
                                        capture_output=True,
                                        text=True)
 
