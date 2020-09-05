@@ -1,11 +1,13 @@
 import subprocess
 import json
 import time
+import platform
+import os
 
 from typing import Tuple
 
 from src.pt.exceptions import *
-from src.pt.path import *
+from src.pt import PT_EXECUTABLE, PT_BIN_ROOT, PT_GRADER
 
 
 def make_params(*args, **kwargs) -> Tuple[str, ...]:
@@ -23,7 +25,7 @@ def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
     if platform.system() == 'Linux':
         ld_library_path = 'LD_LIBRARY_PATH'
         if not os.getenv(ld_library_path):
-            os.environ[ld_library_path] = PT_BIN_DIR
+            os.environ[ld_library_path] = PT_BIN_ROOT
 
     params = make_params(PT_EXECUTABLE,
                          **{
@@ -32,7 +34,7 @@ def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
                          })
 
     process = subprocess.Popen(params,
-                               cwd=PT_BIN_DIR,
+                               cwd=PT_BIN_ROOT,
                                stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL)
     time.sleep(load_interval)
