@@ -19,7 +19,7 @@ def run_pt():
 @pytest.mark.parametrize(
     ('filepath', 'password', 'expected'),
     [(filepath, password, data) for filepath, (password, data) in
-     load_index(NORMAL_PT_DATA_ROOT).items()]
+     load_index(PT_DATA_ROOT).items()]
 )
 def test_connection_error(filepath, password, expected):
     with pytest.raises(GraderConnectionError):

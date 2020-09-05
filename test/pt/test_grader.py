@@ -17,7 +17,7 @@ def parallel(request):
 
 
 def test_normal(parallel):
-    index = load_index(NORMAL_PT_DATA_ROOT)
+    index = load_index(PT_DATA_ROOT)
     expected = {filepath: data for filepath, (password, data) in index.items()}
     labs = {filepath: password for filepath, (password, data) in index.items()}
     graded = grade(labs, LOAD_INTERVAL, parallel)
@@ -26,7 +26,7 @@ def test_normal(parallel):
 
 
 def test_wrong_password(parallel):
-    index = load_index(NORMAL_PT_DATA_ROOT)
+    index = load_index(PT_DATA_ROOT)
     labs = {filepath: password + 'wrong_password' for filepath, (password, data) in index.items()}
     graded = grade(labs, LOAD_INTERVAL, parallel)
     all_data_is_none = all(data is None for data, _ in graded.values())

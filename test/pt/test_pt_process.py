@@ -17,7 +17,7 @@ def get_pt_process():
 @pytest.mark.parametrize(
     ('filepath', 'password', 'expected'),
     [(filepath, password, data) for filepath, (password, data) in
-     load_index(NORMAL_PT_DATA_ROOT).items()]
+     load_index(PT_DATA_ROOT).items()]
 )
 def test_normal(filepath, password, expected, get_pt_process):
     pt_process = get_pt_process
@@ -28,7 +28,7 @@ def test_normal(filepath, password, expected, get_pt_process):
 @pytest.mark.parametrize(
     ('filepath', 'password', 'expected'),
     [(filepath, password + 'wrong_password', data) for filepath, (password, data) in
-     load_index(NORMAL_PT_DATA_ROOT).items()]
+     load_index(PT_DATA_ROOT).items()]
 )
 def test_wrong_password(filepath, password, expected, get_pt_process):
     pt_process = get_pt_process
