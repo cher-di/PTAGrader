@@ -1,5 +1,4 @@
 import pytest
-import dataclasses
 import tempfile
 
 from src.pt.pt_process import PTProcess
@@ -22,7 +21,7 @@ def get_pt_process():
 def test_normal(filepath, password, expected, get_pt_process):
     pt_process = get_pt_process
     data = pt_process.grade(filepath, password)
-    assert dataclasses.asdict(data) == expected
+    assert data == expected
 
 
 @pytest.mark.parametrize(

@@ -4,6 +4,8 @@ import string
 import random
 import time
 
+from src.pt.activity_file_data import ActivityFileData
+
 random.seed(time.time())
 
 
@@ -11,7 +13,8 @@ def load_index(root: str) -> dict:
     index_path = os.path.join(root, 'index.json')
     with open(index_path, 'r') as file:
         index = json.load(file)
-    return {os.path.join(root, filename): (data.pop('password'), data) for filename, data in index.items()}
+    return {os.path.join(root, filename): (data.pop('password'), ActivityFileData(**data))
+            for filename, data in index.items()}
 
 
 def generate_random_string(length: int) -> str:

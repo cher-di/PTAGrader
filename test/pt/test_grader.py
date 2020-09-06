@@ -1,5 +1,4 @@
 import pytest
-import dataclasses
 import tempfile
 
 from src.pt.grader import grade
@@ -18,11 +17,9 @@ def parallel(request):
 
 def test_normal(parallel):
     index = load_index(PT_DATA_ROOT)
-    expected = {filepath: data for filepath, (password, data) in index.items()}
+    expected = {filepath: (data, None) for filepath, (password, data) in index.items()}
     labs = {filepath: password for filepath, (password, data) in index.items()}
-    graded = grade(labs, parallel)
-    graded_to_dict = {filepath: dataclasses.asdict(data) for filepath, (data, error) in graded.items()}
-    assert graded_to_dict == expected
+    assert grade(labs, parallel) == expected
 
 
 def test_wrong_password(parallel):
