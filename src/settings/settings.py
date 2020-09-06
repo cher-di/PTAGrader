@@ -25,7 +25,6 @@ class Lab:
 @dataclasses.dataclass(frozen=True)
 class Grader:
     parallel: bool
-    load_interval: int
     nogui: bool
 
 

@@ -5,7 +5,6 @@ MAIN_CONFIG_SCHEMA = {
             'type': 'object',
             'properties': {
                 'parallel': {'type': 'boolean'},
-                'load_interval': {'type': 'integer', 'minimum': 0},
                 'nogui': {'type': 'boolean'},
             }
         },
