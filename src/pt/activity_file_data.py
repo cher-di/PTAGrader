@@ -5,19 +5,19 @@ import dataclasses
 class ActivityFileData:
     name: str
     email: str
-    add_info: str = dataclasses.field(init=False)
-    time_elapsed: int = dataclasses.field(init=False)
-    lab_id: str = dataclasses.field(init=False)
-    complete: int = dataclasses.field(init=False)
-    addInfo: dataclasses.InitVar[str]
-    timeElapsed: dataclasses.InitVar[int]
-    labID: dataclasses.InitVar[str]
-    percentageComplete: dataclasses.InitVar[float]
-    percentageCompleteScore: dataclasses.InitVar[float]
+    add_info: str
+    time_elapsed: int
+    lab_id: str
+    complete: int
 
-    def __post_init__(self, addInfo: str, timeElapsed: int, labID: str, percentageComplete: float,
-                      percentageCompleteScore: float):
-        object.__setattr__(self, 'add_info', addInfo)
-        object.__setattr__(self, 'time_elapsed', timeElapsed // 1000 + 1 if timeElapsed % 1000 else timeElapsed // 1000)
-        object.__setattr__(self, 'lab_id', labID)
-        object.__setattr__(self, 'complete', int(percentageCompleteScore))
+
+def activity_data_from_grader_response(data: dict) -> ActivityFileData:
+    name = data['name']
+    email = data['email']
+    add_info = data['addInfo']
+    time_elapsed_milliseconds = data['timeElapsed']
+    time_elapsed_seconds = time_elapsed_milliseconds // 1000 + 1 if time_elapsed_milliseconds % 1000 else \
+        time_elapsed_milliseconds // 1000
+    lab_id = data['labID']
+    complete = int(data['percentageCompleteScore'])
+    return ActivityFileData(name, email, add_info, time_elapsed_seconds, lab_id, complete)

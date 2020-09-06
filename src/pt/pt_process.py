@@ -5,7 +5,7 @@ import src.pt.exceptions
 
 from src.commons.functions import get_free_port
 
-from src.pt.activity_file_data import ActivityFileData
+from src.pt.activity_file_data import ActivityFileData, activity_data_from_grader_response
 
 
 class PTProcess:
@@ -26,7 +26,7 @@ class PTProcess:
 
     def grade(self, filepath: str, password: str) -> ActivityFileData:
         data = src.pt.tools.call_grader(filepath, password, port=self._port)
-        return ActivityFileData(**data)
+        return activity_data_from_grader_response(data)
 
     def start(self):
         if not self._process:
