@@ -53,6 +53,7 @@ def launch_pt(port=39000, nogui=False, attempts=120, delay=500) -> subprocess.Po
             break
         time.sleep(delay / 1000)
     else:
+        process.kill()
         raise LaunchingPacketTracerTimeout(port, nogui)
 
     return process
