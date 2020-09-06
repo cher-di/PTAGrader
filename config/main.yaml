@@ -2,9 +2,6 @@ grader:
   parallel: True
   nogui: True
 
-classroom:
-  course_id: "12345678"
-
 mailer:
   enable_students_mailing: True
   enable_admins_mailing: True
