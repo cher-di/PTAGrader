@@ -10,7 +10,7 @@ from test.pt import *
 
 @pytest.fixture(scope='module')
 def get_pt_process():
-    with PTProcess(LOAD_INTERVAL) as pt_process:
+    with PTProcess() as pt_process:
         yield pt_process
 
 

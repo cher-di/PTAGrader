@@ -11,7 +11,7 @@ from test.pt import *
 @pytest.fixture(scope='module')
 def run_pt():
     port = get_free_port()
-    process = launch_pt(port, load_interval=LOAD_INTERVAL)
+    process = launch_pt(port)
     yield port
     process.kill()
 
