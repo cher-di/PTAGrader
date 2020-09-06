@@ -11,9 +11,8 @@ from src.pt.pt_process import PTProcess
 
 
 class Grader:
-    def __init__(self, labs: Mapping[str, str], load_interval: int, parallel=False, nogui=False):
+    def __init__(self, labs: Mapping[str, str], parallel=False, nogui=False):
         self._labs = tuple(labs.items())
-        self._load_interval = load_interval
         self._parallel = parallel
         self._nogui = nogui
 
@@ -28,7 +27,7 @@ class Grader:
             else:
                 return data, None
 
-        with PTProcess(self._load_interval, nogui=self._nogui) as pt_process:
+        with PTProcess(nogui=self._nogui) as pt_process:
             return tuple((filepath, _grade_one(filepath, password, pt_process)) for filepath, password in labs)
 
     def _grade_sequentially(self) -> Dict[str, Tuple[ActivityFileData, ExternalToolError]]:
@@ -65,5 +64,5 @@ class Grader:
             return self._grade_parallel(process_num)
 
 
-def grade(labs: Mapping[str, str], load_interval: int, parallel=False, nogui=False):
-    return Grader(labs, load_interval, parallel, nogui).run()
+def grade(labs: Mapping[str, str], parallel=False, nogui=False):
+    return Grader(labs, parallel, nogui).run()

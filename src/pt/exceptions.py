@@ -23,6 +23,16 @@ class LaunchingPacketTracerError(ExternalToolError):
         return self._nogui
 
 
+class LaunchingPacketTracerTimeout(LaunchingPacketTracerError):
+    def __str__(self):
+        return f'Timeout occurred while launching Packet Tracer on port {self._port} with nogui={self._nogui}'
+
+
+class PortInUse(LaunchingPacketTracerError):
+    def __str__(self):
+        return f'Port {self._port} is already in use'
+
+
 class GraderError(ExternalToolError):
     pass
 
@@ -75,18 +85,13 @@ class MetaRunningError(ExternalToolError):
 
 
 class PTProcessError(Exception):
-    def __init__(self, port: int, load_interval: int, nogui: bool):
+    def __init__(self, port: int, nogui: bool):
         self._port = port
-        self._load_interval = load_interval
         self._nogui = nogui
 
     @property
     def port(self) -> int:
         return self._port
-
-    @property
-    def load_interval(self) -> int:
-        return self._load_interval
 
     @property
     def nogui(self) -> bool:
@@ -95,16 +100,9 @@ class PTProcessError(Exception):
 
 class PTProcessAlreadyRunningError(PTProcessError):
     def __str__(self):
-        return f'This instance of PTProcess with port={self._port}, load_interval={self._load_interval} ' \
-               f'and nogui={self._nogui} is already running'
+        return f'This instance of PTProcess with port={self._port}, and nogui={self._nogui} is already running'
 
 
 class PTProcessNotStarted(PTProcessError):
     def __str__(self):
-        return f'This instance of PTProcess with port={self._port}, load_interval={self._load_interval} ' \
-               f'and nogui={self._nogui} is not started'
-
-
-class PortInUse(PTProcessError):
-    def __str__(self):
-        return f'Port {self._port} is already in use'
+        return f'This instance of PTProcess with port={self._port}, and nogui={self._nogui} is not started'

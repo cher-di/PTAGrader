@@ -3,11 +3,13 @@ import json
 import time
 import platform
 import os
+import socket
 
 from typing import Tuple
 
 from src.pt.exceptions import *
 from src.pt import PT_EXECUTABLE, PT_BIN_ROOT, PT_GRADER
+from src.commons.functions import is_port_in_use
 
 
 def make_params(*args, **kwargs) -> Tuple[str, ...]:
@@ -21,11 +23,15 @@ def make_params(*args, **kwargs) -> Tuple[str, ...]:
     return tuple(params)
 
 
-def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
+def launch_pt(port=39000, nogui=False, attempts=120, delay=500) -> subprocess.Popen:
     if platform.system() == 'Linux':
         ld_library_path = 'LD_LIBRARY_PATH'
         if not os.getenv(ld_library_path):
             os.environ[ld_library_path] = PT_BIN_ROOT
+
+    # check if port is in use
+    if is_port_in_use(port):
+        raise PortInUse(port, nogui)
 
     params = make_params(PT_EXECUTABLE,
                          **{
@@ -37,9 +43,18 @@ def launch_pt(port=39000, nogui=False, load_interval=10) -> subprocess.Popen:
                                cwd=PT_BIN_ROOT,
                                stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL)
-    time.sleep(load_interval)
     if process.poll():
         raise LaunchingPacketTracerError(port, nogui)
+
+    # wait until PT is up
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for i in range(attempts):
+        if not sock.connect_ex(('localhost', port)):
+            break
+        time.sleep(delay / 1000)
+    else:
+        raise LaunchingPacketTracerTimeout(port, nogui)
+
     return process
 
 

@@ -1,6 +1,5 @@
 grader:
   parallel: True
-  load_interval: 10
   nogui: True
 
 classroom:
