@@ -40,9 +40,12 @@ LABS_CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': {
         'type': 'object',
-        'properties': {
-            'lab_id': {'type': 'string'},
-            'password': {'type': 'string'}
+        'additionalProperties': {
+            'type': 'object',
+            'properties': {
+                'filename': {'type': 'string'},
+                'password': {'type': 'string'}
+            }
         }
     }
 }
