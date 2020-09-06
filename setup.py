@@ -1,15 +1,12 @@
 import os
 import shutil
 import platform
+import argparse
+import ctypes
+
 from pathlib import Path
 
-from src import PROJECT_ROOT
-from src.pt import PTA_GRADER_ROOT
-
-BIN_ROOT = os.path.join(PROJECT_ROOT, 'bin')
-GRADER = 'Grader.jar'
-PT_CONF = 'PT.conf'
-PTA_FILE = 'PTAGrader.pta'
+from src.pt import PTA_GRADER_ROOT, PT_GRADER
 
 HOME = str(Path().home())
 
@@ -18,24 +15,67 @@ if platform.system() == 'Windows':
 elif platform.system() == 'Linux':
     PT_DATA_ROOT = os.path.join(HOME, 'pt')
 else:
-    raise OSError(f'Unsupported OS: {platform.system()}')
+    raise Exception(f'Unsupported OS: {platform.system()}')
+
+PT_CONF = os.path.join(PT_DATA_ROOT, 'PT.conf')
+PTA_FILE = os.path.join(PTA_GRADER_ROOT, 'PTAGrader.pta')
 
 
-def check_file(filepath: str):
+def check_file(parser: argparse.ArgumentParser, filepath: str):
     if not os.path.isfile(filepath):
-        raise FileNotFoundError(filepath)
+        parser.error(f'{filepath} not exists')
+    return filepath
+
+
+def check_admin_privileges() -> bool:
+    if platform.system() == 'Windows':
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    elif platform.system() == 'Linux':
+        return os.getuid() == 0
+    else:
+        raise Exception(f'Unsupported OS: {platform.system()}')
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(prog='Setup PTAGrader to your machine',
+                                     description="""Before running this utility, download Grader.jar, PTAGrader.pta and
+                                     PT.conf. Grader.jar and PTAGrader.pta are cross-platform, PT.conf is platform dependent.
+                                     After that start this utility with paths to downloaded files.""",
+                                     epilog="""It is strongly recommended to run this utility right after PacketTracer
+                                     installation!
+                                     Run this utility only when PacketTracer is switched off!
+                                     You must invoke root privileges before running this script!""")
+    parser.add_argument('grader',
+                        metavar='GRADER',
+                        help='Path to Grader.jar file',
+                        type=lambda x: check_file(parser, x))
+    parser.add_argument('conf',
+                        metavar='CONF',
+                        help='Path to PT.conf file',
+                        type=lambda x: check_file(parser, x))
+    parser.add_argument('pta',
+                        metavar='PTA',
+                        help='Path to PTAGrader.pta file',
+                        type=lambda x: check_file(parser, x))
+
+    return parser.parse_args()
+
+
+def main(grader: str, pta_file: str, pt_conf: str):
+    # check if script run as root
+    if not check_admin_privileges():
+        raise Exception('Run this script with admin privileges')
+
+    # make PT extension
+    os.makedirs(PTA_GRADER_ROOT, exist_ok=True)
+    shutil.copyfile(grader, PT_GRADER)
+    shutil.copyfile(pta_file, PTA_FILE)
+
+    # make PT data directory
+    os.makedirs(PT_DATA_ROOT, exist_ok=True)
+    shutil.copyfile(pt_conf, PT_CONF)
 
 
 if __name__ == '__main__':
-    # check binaries
-    for filename in (GRADER, PT_CONF, PTA_FILE):
-        check_file(os.path.join(BIN_ROOT, filename))
-
-    # make PT extension
-    os.mkdir(PTA_GRADER_ROOT)
-    for filename in (GRADER, PTA_FILE):
-        shutil.copyfile(os.path.join(BIN_ROOT, filename), os.path.join(PTA_GRADER_ROOT, filename))
-
-    # make PT data directory
-    os.mkdir(PT_DATA_ROOT)
-    shutil.copyfile(os.path.join(BIN_ROOT, PT_CONF), os.path.join(PT_DATA_ROOT, PT_CONF))
+    args = parse_args()
+    main(args.grader, args.pta, args.conf)
