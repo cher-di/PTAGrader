@@ -1,48 +1,115 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+  <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отчёт системы автопроверки лабораторных работ</title>
-    <style type="text/css">
-        TABLE {
-            width: 300px;
-            border-collapse: collapse;
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="logo"></div>
+      <div class="info">
+        <header class="header">
+          <h1 class="title">Отчёт системы автопроверки лабораторных работ</h1>
+        </header>
+        <p>
+          Здравствуйте, {{name}}!<br>
+          Вы сдали лабораторную работу: <b>{{lab_name}}</b>.
+        </p>
+        <p>
+          Ваша оценка за лабораторную работу: <b>{{mark}}</b>. <br>
+          Если Вы хотите улучшить оценку, Вы можете исправить лабораторную и сдать её заново.
+        </p>
+      </div>
+      <div class="error">
+        <h2 class="errorTitle">Ошибка!</h2>
+        <p class="errorInfo">Вы указали неверный адрес электронной почты.</p>
+        <table class="table">
+          <tr class="tableRow">
+            <td class="tableRowItem">Ваш адрес</td>
+            <td class="tableRowItem">{{real_email}}</td>
+          </tr>
+          <tr class="tableRow">
+            <td class="tableRowItem">Адрес из файла</td>
+            <td class="tableRowItem">{{extracted_email}}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="recommendations">
+        <h2 class="recommendationsTitle">Рекомендации</h2>
+        <p>
+          Во вложении к этому письму Вы можете найти файл с вашей лабораторной.
+          Вы можете проверить, что файл, который получил робот, совпадает с файлом, который Вы отправили на проверку.
+        </p>
+      </div>
+      <p class="help">Если у Вас возникли какие-то вопросы, Вы можете обратиться в службу поддержки МИЭМ в Zulip.</p>
+    </div>
+    <style>
+      body {
+        background-color: #f0f0f0;
+      }
+
+      .wrapper {
+        max-width: 900px;
+        min-width: 255px;
+        margin: auto;
+        font-family: sans-serif;
+        padding-top: 10px;
+      }
+ 
+      .logo {
+        width: 150px;
+        height: 39px;
+        background: url("https://www.tadviser.ru/images/4/4f/Логотип_МИЭМ.svg.png") center no-repeat;
+        background-size: contain;
+        margin: 0 auto 10px 0;
+      }
+
+      .info, .error, .recommendations, .help {
+        border-radius: 10px;
+        background-color: #fff;
+        padding: 20px 20px 25px;
+        margin: 0 0 10px;
+      }
+
+      .title, .errorTitle, .recommendationsTitle {
+        margin: 0 0 5px;
+      }
+      
+      .errorInfo {
+        color: lightcoral;
+      }
+
+      .table {
+        margin-top: 10px;
+        border-collapse: collapse;
+      }
+
+      .tableRowItem {
+        border: 1px solid black;
+        padding: 5px;
+      }
+
+      p {
+        font-size: 15px;
+        line-height: 25px;
+        margin: 0;
+      }
+
+      .help {
+        color: #c6c6c6;
+      }
+
+      @media screen and (max-width: 768px) {
+        .header {
+          display: block;
         }
 
-        TD, TH {
-            padding: 1px;
-            border: 1px solid black;
-            text-align: left;
+        p {
+          font-size: 17px;
         }
+      }
     </style>
-</head>
-<body>
-<h1>Отчёт системы автопроверки лабораторных работ</h1>
-<p>
-    Здравствуйте {{name}}!<br>
-    Вы сдали лабораторную работу: <b>{{lab_name}}</b>.<br>
-</p>
-<p>
-    Ваша оценка за лабораторную работу: <b>{{mark}}</b>.<br>
-    Если Вы хотите улучшить оценку, Вы можете исправить лабораторную и сдать её заново.<br>
-</p>
-<h2>Ошибка!</h2>
-<p>Вы указали неверный адрес электронной почты.</p>
-<table>
-    <tr>
-        <td>Ваш адрес</td>
-        <td>{{real_email}}</td>
-    </tr>
-    <tr>
-        <td>Адрес из файла</td>
-        <td>{{extracted_email}}</td>
-    </tr>
-</table>
-<h2>Рекомендации</h2>
-<p>
-    Во вложении к этому письму Вы можете найти файл с вашей лабораторной.<br>
-    Вы можете проверить, что файл, который получил робот, совпадает с файлом, который Вы отправили на проверку.<br>
-</p>
-<p>Если у Вас возникли какие-то вопросы, Вы можете обратиться в службу поддержки МИЭМ в Zulip.</p>
-</body>
+  </body>
 </html>
