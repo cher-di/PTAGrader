@@ -42,7 +42,7 @@ class Mailer(ABC):
         pass
 
     @abstractmethod
-    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
+    def send(self, address: str, message: MIMEMultipart):
         pass
 
 
@@ -54,7 +54,7 @@ class SMTPLIBMailer(Mailer, ABC):
     def close(self):
         self._connection.close()
 
-    def send(self, address: Union[str, Iterable[str]], message: MIMEMultipart):
+    def send(self, address: str, message: MIMEMultipart):
         if not self._connection:
             raise ConnectionError(f'Mailer is not connected to SMTP server {self._server}')
         new_message = self.__class__._add_from_and_to(self._address, address, message, self._name)
