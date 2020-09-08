@@ -1,12 +1,5 @@
 import dataclasses
 
-from src.pt.activity_file_data import ActivityFileData
-
-
-@dataclasses.dataclass(frozen=True)
-class Lab(ActivityFileData):
-    password: str
-
 
 @dataclasses.dataclass(frozen=True)
 class Grader:

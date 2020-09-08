@@ -43,8 +43,13 @@ LABS_CONFIG_SCHEMA = {
         'additionalProperties': {
             'type': 'object',
             'properties': {
-                'filename': {'type': 'string'},
-                'password': {'type': 'string'}
+                'password': {'type': 'string'},
+                'name': {'type': 'string'},
+                'email': {'type': 'string', 'format': 'email'},
+                'complete': {'type': 'integer', 'minimum': 0, 'maximum': 100},
+                'add_info': {'type': 'string'},
+                'time_elapsed': {'type': 'integer', 'minimum': 0},
+                'lab_id': {'type': 'string'}
             }
         }
     }
