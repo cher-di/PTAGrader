@@ -1,0 +1,33 @@
+{
+  "course_id1": {
+    "course_work_id11": {
+      "password": "123",
+      "name": "name1",
+      "email": "example1@mail.ru",
+      "complete": 0,
+      "add_info": "",
+      "time_elapsed": 6,
+      "lab_id": "1"
+    }
+  },
+  "course_id2": {
+    "course_work_id21": {
+      "password": "123",
+      "name": "name2",
+      "email": "example2@mail.ru",
+      "complete": 11,
+      "add_info": "",
+      "time_elapsed": 12,
+      "lab_id": "2"
+    },
+    "course_work_id22": {
+      "password": "123",
+      "name": "name3",
+      "email": "example3@mail.ru",
+      "complete": 16,
+      "add_info": "",
+      "time_elapsed": 22,
+      "lab_id": "3"
+    }
+  }
+}

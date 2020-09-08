@@ -1,0 +1,20 @@
+{
+  "grader": {
+    "parallel": true,
+    "nogui": true
+  },
+  "mailer": {
+    "enable_students_mailing": true,
+    "enable_admins_mailing": true,
+    "server": "smtp.example.ru",
+    "connection": "ssl",
+    "port": 465,
+    "address": "mailer@example.com",
+    "password": "password",
+    "name": "name",
+    "admins_mail_list": [
+      "admin1@example.com",
+      "admin2@example.com"
+    ]
+  }
+}
