@@ -1,5 +1,7 @@
 import subprocess
 
+from typing import Callable
+
 import src.pt.tools
 import src.pt.exceptions
 
@@ -14,9 +16,9 @@ class PTProcess:
         self._nogui = nogui
         self._process: subprocess.Popen = None
 
-    def __enter__(self) -> 'PTProcess':
+    def __enter__(self) -> Callable:
         self.start()
-        return self
+        return self.grade
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()

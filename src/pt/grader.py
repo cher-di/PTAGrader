@@ -18,17 +18,17 @@ class Grader:
 
     def _grade(self, labs: Iterable[Tuple[str, str]]) -> Tuple[Tuple[str, Tuple[ActivityFileData, ExternalToolError]],
                                                                ...]:
-        def _grade_one(_filepath: str, _password: str, _pt_process: PTProcess) -> Tuple[ActivityFileData,
-                                                                                        ExternalToolError]:
-            try:
-                data = _pt_process.grade(_filepath, _password)
-            except ExternalToolError as e:
-                return None, e
-            else:
-                return data, None
+        with PTProcess(nogui=self._nogui) as _call_grade:
+            def _grade_one(_filepath: str, _password: str) -> Tuple[ActivityFileData,
+                                                                                            ExternalToolError]:
+                try:
+                    data = _call_grade(_filepath, _password)
+                except ExternalToolError as e:
+                    return None, e
+                else:
+                    return data, None
 
-        with PTProcess(nogui=self._nogui) as pt_process:
-            return tuple((filepath, _grade_one(filepath, password, pt_process)) for filepath, password in labs)
+            return tuple((filepath, _grade_one(filepath, password)) for filepath, password in labs)
 
     def _grade_sequentially(self) -> Dict[str, Tuple[ActivityFileData, ExternalToolError]]:
         return dict(self._grade(self._labs))
