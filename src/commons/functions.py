@@ -1,4 +1,8 @@
 import socket
+import argparse
+import platform
+import os
+import ctypes
 
 from typing import Tuple, Any, Iterable, Generator
 
@@ -20,3 +24,24 @@ def get_chunks(array: Iterable[Any], chunks: int) -> Generator[Tuple[Any, ...], 
     chunk_len = array_len // chunks
     for i in range(0, len(array), chunk_len):
         yield tuple(element for element in array[i:i + chunk_len])
+
+
+def check_file(parser: argparse.ArgumentParser, filepath: str):
+    if not os.path.isfile(filepath):
+        parser.error(f'{filepath} not exists')
+    return filepath
+
+
+def check_dir(parser: argparse.ArgumentParser, dirpath: str):
+    if not os.path.isdir(dirpath):
+        parser.error(f'{dirpath} not exists')
+    return dirpath
+
+
+def check_admin_privileges() -> bool:
+    if platform.system() == 'Windows':
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    elif platform.system() == 'Linux':
+        return os.getuid() == 0
+    else:
+        raise Exception(f'Unsupported OS: {platform.system()}')
