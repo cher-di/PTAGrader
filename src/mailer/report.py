@@ -18,6 +18,8 @@ class Report(abc.ABC):
         self._name = name
         self._lab_name = lab_name
         self._mark = mark
+        template = env.get_template(self.html_template)
+        self._html = template.render(self.parameters)
 
     @property
     def parameters(self) -> dict:
@@ -32,9 +34,9 @@ class Report(abc.ABC):
     def html_template(self) -> str:
         pass
 
+    @property
     def html(self) -> str:
-        template = env.get_template(self.html_template)
-        return template.render(self.parameters)
+        return self._html
 
 
 class ErrorReport(Report, abc.ABC):
