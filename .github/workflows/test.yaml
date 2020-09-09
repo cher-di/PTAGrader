@@ -42,7 +42,7 @@ jobs:
       - name: Install Packet Tracer
         run: |
           sudo mkdir /usr/share/desktop-directories/
-          sudo apt-get install ./bin/PacketTracer_731_amd64_silent.deb -y
+          sudo apt-get install ./bin/PacketTracer_731_amd64_silent.deb -y || true
 
       - name: Install OpenJDK 11
         run: sudo apt-get install openjdk-11-jre
