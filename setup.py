@@ -3,7 +3,7 @@ import shutil
 import platform
 import argparse
 
-from src import HOME
+from src import HOME, DATA_ROOT
 from src.pt import PTA_GRADER_ROOT, PT_GRADER
 from src.commons.functions import check_file, check_admin_privileges
 
@@ -56,6 +56,9 @@ def main(grader: str, pta_file: str, pt_conf: str):
     # change PT.conf
     os.makedirs(PT_DATA_ROOT, exist_ok=True)
     shutil.copyfile(pt_conf, PT_CONF)
+
+    # make data directory
+    os.makedirs(DATA_ROOT, exist_ok=True)
 
 
 if __name__ == '__main__':
