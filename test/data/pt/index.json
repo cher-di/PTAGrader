@@ -1,3 +1,47 @@
 {
-  
+  "lab1.pka": {
+    "password": "123",
+    "name": "Alexander",
+    "email": "Alexander@test.com",
+    "complete": 0,
+    "add_info": "Test",
+    "time_elapsed": 24,
+    "lab_id": "1"
+  },
+  "lab2.pka": {
+    "password": "123",
+    "name": "Dmitry",
+    "email": "Dmitry@test.com",
+    "complete": 11,
+    "add_info": "",
+    "time_elapsed": 15,
+    "lab_id": "2"
+  },
+  "lab3.pka": {
+    "password": "123",
+    "name": "Andrei",
+    "email": "Andrei@test.com",
+    "complete": 16,
+    "add_info": "123",
+    "time_elapsed": 19,
+    "lab_id": "3"
+  },
+  "lab4.pka": {
+    "password": "321",
+    "name": "Vasily",
+    "email": "Vasily@test.org",
+    "complete": 22,
+    "add_info": "",
+    "time_elapsed": 26,
+    "lab_id": "4"
+  },
+  "lab5.pka": {
+    "password": "321",
+    "name": "Kirill",
+    "email": "Kirill@test.org",
+    "complete": 89,
+    "add_info": "321",
+    "time_elapsed": 56,
+    "lab_id": "5"
+  }
 }
