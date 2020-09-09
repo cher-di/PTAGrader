@@ -39,14 +39,13 @@ jobs:
             wget -O bin/$file $address/nix/$file
           done
 
-      - name: Install Gnome 3
-        run: sudo apt install gnome-session gdm3 -y
-
       - name: Install Packet Tracer
-        run: sudo apt install ./bin/PacketTracer_731_amd64_silent.deb -y
+        run: |
+          sudo mkdir /usr/share/desktop-directories/
+          sudo apt-get install ./bin/PacketTracer_731_amd64_silent.deb -y
 
       - name: Install OpenJDK 11
-        run: sudo apt install openjdk-11-jre
+        run: sudo apt-get install openjdk-11-jre
 
       # Install Python packages
       - name: Install Python packages
