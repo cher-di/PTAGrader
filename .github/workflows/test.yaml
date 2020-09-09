@@ -39,14 +39,9 @@ jobs:
             wget -O bin/$file $address/nix/$file
           done
 
-      - name: Install Gnome 3
-        run: |
-          sudo apt-get install gnome-session gdm3
-          sudo systemctl restart systemd-logind
-
       - name: Install Packet Tracer
         run: |
-          # sudo mkdir /usr/share/desktop-directories/
+          sudo mkdir /usr/share/desktop-directories/
           sudo apt-get install ./bin/PacketTracer_731_amd64_silent.deb -y
 
       - name: Install OpenJDK 11
