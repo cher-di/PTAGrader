@@ -29,17 +29,14 @@ jobs:
       - name: Download binaries
         run: |
           mkdir bin
-          domain="urbash.ru"
-          proto="ftp"
-          files_root="pt"
-          address=$proto//$domain/$files_root
+          address="ftp://urbash.ru/pt"
           for file in PTAGrader.pta Grader.jar
           do
-            wget -P bin -O $file address/$file
+            wget -O bin/$file address/$file
           done
           for file in PT.conf PacketTracer_731_amd64_silent.deb
           do
-            wget -P bin -O $file address/nix/$file
+            wget -O bin/$file address/nix/$file
           done
 
       - name: Install Packet Tracer
