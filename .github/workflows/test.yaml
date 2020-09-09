@@ -54,7 +54,7 @@ jobs:
           python3 -m pip install --upgrade -r requirements.txt
 
       - name: Install App
-        run: sudo -E python setup.py bin/Grader.jar bin/PT.conf bin/PTAGrader.pta
+        run: sudo -E python3 setup.py bin/Grader.jar bin/PT.conf bin/PTAGrader.pta
 
       # Runs a single command using the runners shell
       - name: Run tests
