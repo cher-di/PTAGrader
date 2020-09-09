@@ -42,6 +42,7 @@ jobs:
       - name: Install Packet Tracer
         run: |
           unzip bin/pt.zip -d /opt
+          sudo apt-get install sudo dialog xdg-utils gtk-update-icon-cache libgl1-mesa-glx libpulse0 libnss3 libxss1 libasound2 libxslt1.1 libxkbcommon-x11-0 -y
 
       - name: Install OpenJDK 11
         run: sudo apt-get install openjdk-11-jre
