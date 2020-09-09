@@ -34,15 +34,14 @@ jobs:
           do
             wget -O bin/$file $address/$file
           done
-          for file in PT.conf PacketTracer_731_amd64_silent.deb
+          for file in PT.conf pt.zip
           do
             wget -O bin/$file $address/nix/$file
           done
 
       - name: Install Packet Tracer
         run: |
-          # sudo mkdir /usr/share/desktop-directories/
-          sudo apt-get install ./bin/PacketTracer_731_amd64_silent.deb -y
+          unzip bin/pt.zip -d /opt
 
       - name: Install OpenJDK 11
         run: sudo apt-get install openjdk-11-jre
