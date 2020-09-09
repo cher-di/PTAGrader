@@ -41,8 +41,8 @@ jobs:
 
       - name: Install Gnome 3
         run: |
-          sudo apt install gnome-session gdm3
-          sudo reboot
+          sudo apt-get install gnome-session gdm3
+          sudo systemctl restart systemd-logind
 
       - name: Install Packet Tracer
         run: |
