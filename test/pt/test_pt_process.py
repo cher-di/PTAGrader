@@ -9,8 +9,8 @@ from test.pt import *
 
 @pytest.fixture(scope='module')
 def get_pt_process():
-    with PTProcess() as pt_process:
-        yield pt_process
+    with PTProcess() as grade:
+        yield grade
 
 
 @pytest.mark.parametrize(
@@ -19,8 +19,7 @@ def get_pt_process():
      load_index(PT_DATA_ROOT).items()]
 )
 def test_normal(filepath, password, expected, get_pt_process):
-    pt_process = get_pt_process
-    data = pt_process.grade(filepath, password)
+    data = get_pt_process(filepath, password)
     assert data == expected
 
 
@@ -30,9 +29,8 @@ def test_normal(filepath, password, expected, get_pt_process):
      load_index(PT_DATA_ROOT).items()]
 )
 def test_wrong_password(filepath, password, expected, get_pt_process):
-    pt_process = get_pt_process
     with pytest.raises(GraderWrongPassword):
-        pt_process.grade(filepath, password)
+        get_pt_process(filepath, password)
 
 
 @pytest.mark.parametrize(
@@ -40,10 +38,9 @@ def test_wrong_password(filepath, password, expected, get_pt_process):
     [(generate_random_filepath(0), generate_random_string(100)) for i in range(5)]
 )
 def test_corrupted(filename, content, get_pt_process):
-    pt_process = get_pt_process
     with tempfile.TemporaryDirectory(dir=DATA_ROOT) as temp_dir:
         filepath = os.path.join(temp_dir, filename)
         with open(filepath, 'w') as file:
             file.write(content)
         with pytest.raises(GraderActivityFileReadingError):
-            pt_process.grade(filepath, 'password')
+            get_pt_process(filepath, 'password')
