@@ -29,10 +29,10 @@ jobs:
       - name: Download binaries
         run: |
           mkdir bin
-          $domain="urbash.ru"
-          $proto="ftp"
-          $files_root="pt"
-          $address=$proto//$domain/$files_root
+          domain="urbash.ru"
+          proto="ftp"
+          files_root="pt"
+          address=$proto//$domain/$files_root
           for file in PTAGrader.pta Grader.jar
           do
             wget -P bin -O $file address/$file
