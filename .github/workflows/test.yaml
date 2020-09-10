@@ -34,7 +34,7 @@ jobs:
           do
             wget -O bin/$file $address/$file
           done
-          for file in PT.conf pt.zip
+          for file in PT.conf PacketTracer_731_amd64_silent.deb
           do
             wget -O bin/$file $address/nix/$file
           done
@@ -51,8 +51,9 @@ jobs:
 
       - name: Install Packet Tracer
         run: |
-          sudo unzip bin/pt.zip -d /opt
-          sudo apt-get install sudo dialog xdg-utils gtk-update-icon-cache libgl1-mesa-glx libpulse0 libnss3 libxss1 libasound2 libxslt1.1 libxkbcommon-x11-0 libx11-xcb1 -y
+          sudo apt-get install ./bin/PacketTracer_731_amd64_silent.deb
+          #sudo unzip bin/pt.zip -d /opt
+          #sudo apt-get install sudo dialog xdg-utils gtk-update-icon-cache libgl1-mesa-glx libpulse0 libnss3 libxss1 libasound2 libxslt1.1 libxkbcommon-x11-0 libx11-xcb1 -y
 
       - name: Check PT installation
         run: |
