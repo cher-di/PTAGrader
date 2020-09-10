@@ -39,8 +39,16 @@ jobs:
             wget -O bin/$file $address/nix/$file
           done
 
+      - name: Preinstallation update
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+
       - name: Install Gnome 3
-        run: sudo apt install gnome-session gdm3 -y
+        run: sudo apt-get install gnome-session gdm3 -y
+
+      - name: Install xcb
+        run: sudo apt-get install xcb
 
       - name: Install Packet Tracer
         run: |
