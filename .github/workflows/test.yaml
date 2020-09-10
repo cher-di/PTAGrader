@@ -45,15 +45,14 @@ jobs:
           sudo apt-get upgrade -y
 
       - name: Install Gnome 3
-        run: sudo apt-get install gnome-session gdm3 -y
-
-      - name: Install xcb
-        run: sudo apt-get install xcb
+        run: |
+          # sudo apt-get install gnome-session gdm3 -y
+          echo "skip Gnome 3 installation"
 
       - name: Install Packet Tracer
         run: |
-          unzip bin/pt.zip -d /opt
-          sudo apt-get install sudo dialog xdg-utils gtk-update-icon-cache libgl1-mesa-glx libpulse0 libnss3 libxss1 libasound2 libxslt1.1 libxkbcommon-x11-0 -y
+          sudo unzip bin/pt.zip -d /opt
+          sudo apt-get install sudo dialog xdg-utils gtk-update-icon-cache libgl1-mesa-glx libpulse0 libnss3 libxss1 libasound2 libxslt1.1 libxkbcommon-x11-0 libx11-xcb1 -y
 
       - name: Check PT installation
         run: |
