@@ -2,7 +2,6 @@ import smtplib
 import copy
 
 from abc import ABC, abstractmethod
-from typing import Iterable, Union, Callable
 
 from email.utils import formataddr
 from email.header import Header
@@ -17,7 +16,7 @@ class Mailer(ABC):
         self._password = password
         self._name = name
 
-    def __enter__(self) -> Callable:
+    def __enter__(self) -> 'send':
         self.open()
         return self.send
 
