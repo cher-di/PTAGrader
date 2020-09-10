@@ -57,6 +57,7 @@ jobs:
 
       - name: Check PT installation
         run: |
+          export QT_DEBUG_PLUGINS=1
           export LD_LIBRARY_PATH=/opt/pt/bin
           /opt/pt/bin/PacketTracer7
 
