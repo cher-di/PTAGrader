@@ -9,9 +9,13 @@ from datetime import datetime
 
 
 class Message:
-    def __init__(self, body: str, subject: str = None, date: datetime = None):
-        self._message = MIMEMultipart('alternative')
-        self._message.attach(MIMEText(body, 'html'))
+    def __init__(self, body: str, subject: str = None, date: datetime = None, html=False):
+        if html:
+            self._message = MIMEMultipart('alternative')
+            self._message.attach(MIMEText(body, 'html'))
+        else:
+            self._message = MIMEMultipart('text')
+            self._message.attach(MIMEText(body))
         if subject:
             self._message['Subject'] = subject
         self._message['Date'] = email.utils.format_datetime(date) if date else email.utils.formatdate()
