@@ -1,12 +1,9 @@
 import os
 import platform
 
-if platform.system() == 'Windows':
-    PT_HOME = r'C:\Program Files\Cisco Packet Tracer 7.3.1'
-elif platform.system() == 'Linux':
-    PT_HOME = '/opt/pt'
-else:
-    raise Exception(f'Unsupported OS: {platform.system()}')
+PT_HOME = os.getenv('PT7HOME')
+if not PT_HOME:
+    raise Exception(f'Can not find Packet Tracer binaries')
 
 PT_BIN_ROOT = os.path.join(PT_HOME, 'bin')
 
