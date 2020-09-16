@@ -18,6 +18,6 @@ def activity_data_from_grader_response(data: dict) -> ActivityFileData:
     time_elapsed_milliseconds = data['timeElapsed']
     time_elapsed_seconds = time_elapsed_milliseconds // 1000 + 1 if time_elapsed_milliseconds % 1000 else \
         time_elapsed_milliseconds // 1000
-    lab_id = data['labID']
+    lab_id = data['variables']['LabID']
     complete = int(data['percentageCompleteScore'])
     return ActivityFileData(name, email, add_info, time_elapsed_seconds, lab_id, complete)
